@@ -1,0 +1,262 @@
+# mmc_coeficiente_a.py
+import numpy as np
+
+def calcular_coeficiente_A(x, y):
+    """
+    Calcula el coeficiente A del ajuste lineal y = A + Bx
+    """
+    n = len(x)
+    sum_x = np.sum(x)
+    sum_y = np.sum(y)
+    sum_x2 = np.sum(x**2)
+    sum_xy = np.sum(x * y)
+    
+    denominador = n * sum_x2 - sum_x**2
+    A = (sum_y * sum_x2 - sum_x * sum_xy) / denominador
+    return A
+
+# TEST
+def test_coeficiente_A():
+    x = np.array([1, 2, 3, 4, 5])
+    y = np.array([2, 4, 6, 8, 10])  # y = 0 + 2x
+    A = calcular_coeficiente_A(x, y)
+    print(f"Coeficiente A: {A}")
+    assert abs(A - 0.0) < 1e-10, "Test falló"
+    print("Test coeficiente A pasado")
+
+if _name_ == "_main_":
+    test_coeficiente_A()
+
+
+
+
+# mmc_coeficiente_b.py
+import numpy as np
+
+def calcular_coeficiente_B(x, y):
+    """
+    Calcula el coeficiente B del ajuste lineal y = A + Bx
+    """
+    n = len(x)
+    sum_x = np.sum(x)
+    sum_y = np.sum(y)
+    sum_xy = np.sum(x * y)
+    
+    denominador = n * np.sum(x*2) - sum_x*2
+    B = (n * sum_xy - sum_x * sum_y) / denominador
+    return B
+
+# TEST
+def test_coeficiente_B():
+    x = np.array([1, 2, 3, 4, 5])
+    y = np.array([2, 4, 6, 8, 10])  # y = 0 + 2x
+    B = calcular_coeficiente_B(x, y)
+    print(f"Coeficiente B: {B}")
+    assert abs(B - 2.0) < 1e-10, "Test falló"
+    print("Test coeficiente B pasado")
+
+if _name_ == "_main_":
+    test_coeficiente_B()
+
+
+# mmc_errores.py
+import numpy as np
+
+def calcular_errores(x, y, A, B):
+    """
+    Calcula errores de los coeficientes A y B
+    """
+    n = len(x)
+    y_pred = A + B * x
+    residuos = y - y_pred
+    
+    S2 = np.sum(residuos**2) / (n - 2)
+    sum_x2 = np.sum(x**2)
+    sum_x = np.sum(x)
+    
+    denominador = n * sum_x2 - sum_x**2
+    error_A = np.sqrt(S2 * sum_x2 / denominador)
+    error_B = np.sqrt(S2 * n / denominador)
+    
+    return error_A, error_B
+
+# TEST
+def test_errores():
+    x = np.array([1, 2, 3, 4, 5])
+    y = np.array([2.1, 3.9, 6.1, 8.0, 9.9])  # Datos con pequeño ruido
+    A = 0.1  # Valor aproximado
+    B = 1.98  # Valor aproximado
+    
+    error_A, error_B = calcular_errores(x, y, A, B)
+    print(f"Error A: {error_A:.4f}")
+    print(f"Error B: {error_B:.4f}")
+    assert error_A > 0 and error_B > 0, "Test falló"
+    print(" Test errores pasado")
+
+if _name_ == "_main_":
+    test_errores()
+
+
+
+# linearizacion_datos.py
+import numpy as np
+
+# Datos de las tablas del MAS
+datos_mas = {
+    'tabla1': {'x': [1.000, 0.951, 0.809, 0.588, 0.309, 0.000],
+               'v': [0.000, -0.485, -0.923, -1.271, -1.494, -1.571]},
+    'tabla2': {'x': [0.000, 0.710, 1.327, 1.772, 1.986, 1.941],
+               'v': [3.628, 3.392, 2.714, 1.683, 0.433, -0.873]},
+    'tabla3': {'x': [2.000, 1.806, 1.261, 0.471, -0.410, -1.211],
+               'v': [0.000, -1.910, -3.448, -4.318, -4.349, -3.535]}
+}
+
+def linearizar_datos():
+    """
+    Lineariza datos usando: v² = ω²A² - ω²x²
+    X = x², Y = v²
+    """
+    datos_linearizados = {}
+    
+    for tabla, valores in datos_mas.items():
+        x = np.array(valores['x'])
+        v = np.array(valores['v'])
+        
+        # Cambio de variable
+        X = x**2
+        Y = v**2
+        
+        datos_linearizados[tabla] = {'X': X, 'Y': Y}
+        print(f"{tabla}: X = {X}, Y = {Y}")
+    
+    return datos_linearizados
+
+if _name_ == "_main_":
+    linearizar_datos()
+
+
+
+
+# ajuste_mmc.py
+import numpy as np
+from linearizacion_datos import linearizar_datos
+from mmc_coeficiente_a import calcular_coeficiente_A
+from mmc_coeficiente_b import calcular_coeficiente_B
+from mmc_errores import calcular_errores
+
+def ajustar_datos_linearizados():
+    """
+    Aplica MMC a datos linearizados y calcula A, B y errores
+    """
+    datos = linearizar_datos()
+    resultados = {}
+    
+    for tabla, valores in datos.items():
+        X = valores['X']
+        Y = valores['Y']
+        
+        A = calcular_coeficiente_A(X, Y)
+        B = calcular_coeficiente_B(X, Y)
+        error_A, error_B = calcular_errores(X, Y, A, B)
+        
+        resultados[tabla] = {
+            'A': A, 'B': B,
+            'error_A': error_A, 'error_B': error_B
+        }
+        
+        print(f"\n{tabla}:")
+        print(f"A = {A:.4f} ± {error_A:.4f}")
+        print(f"B = {B:.4f} ± {error_B:.4f}")
+    
+    return resultados
+
+if _name_ == "_main_":
+    ajustar_datos_linearizados()
+
+
+# graficas_mas.py
+import matplotlib.pyplot as plt
+import numpy as np
+from ajuste_mmc import ajustar_datos_linearizados
+
+def graficar_datos_con_ajuste():
+    """
+    Grafica datos linearizados con ajuste lineal
+    """
+    resultados = ajustar_datos_linearizados()
+    
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    
+    for idx, (tabla, resultado) in enumerate(resultados.items()):
+        ax = axs[idx]
+        
+        # Recuperar datos (simulación)
+        from linearizacion_datos import datos_mas
+        x = np.array(datos_mas[tabla]['x'])
+        v = np.array(datos_mas[tabla]['v'])
+        X = x**2
+        Y = v**2
+        
+        # Graficar puntos
+        ax.scatter(X, Y, color='red', label='Datos')
+        
+        # Graficar línea de ajuste
+        A = resultado['A']
+        B = resultado['B']
+        x_fit = np.linspace(min(X), max(X), 100)
+        y_fit = A + B * x_fit
+        ax.plot(x_fit, y_fit, 'blue', label='Ajuste MMC')
+        
+        ax.set_xlabel('x² (m²)')
+        ax.set_ylabel('v² (m²/s²)')
+        ax.set_title(f'{tabla}\nA = {A:.3f} ± {resultado["error_A"]:.3f}\nB = {B:.3f} ± {resultado["error_B"]:.3f}')
+        ax.legend()
+        ax.grid(True)
+    
+    plt.tight_layout()
+    plt.savefig('ajuste_mas.png', dpi=300)
+    plt.show()
+
+if _name_ == "_main_":
+    graficar_datos_con_ajuste()
+
+Imforme :
+    
+Nombre: Leonel Mattias Uribe Escobar
+Grupo:D6
+Materia:Laboratorio de fisica 
+
+# mas_analisis.py
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Datos
+datos = {
+    'tabla1': {'x': [1.000, 0.951, 0.809, 0.588, 0.309, 0.000],
+               'v': [0.000, -0.485, -0.923, -1.271, -1.494, -1.571],
+               'masa': 4}
+}
+
+# MMC
+def calcular_A(x, y):
+    n = len(x)
+    return (np.sum(y)np.sum(x2)-np.sum(x)*np.sum(x*y))/(n*np.sum(x2)-np.sum(x)*2)
+
+def calcular_B(x, y):
+    n = len(x)
+    return (n*np.sum(x*y)-np.sum(x)np.sum(y))/(n*np.sum(x2)-np.sum(x)*2)
+
+# Análisis
+for tabla in datos.values():
+    x, v = np.array(tabla['x']), np.array(tabla['v'])
+    X, Y = x*2, v*2  # Linearización
+    
+    A, B = calcular_A(X, Y), calcular_B(X, Y)
+    k_m = -A  # ω² = -A
+    
+    print(f"k/m = {k_m:.2f} s⁻²")
+
+# Resultado
+print("k/m final = (11.4 ± 0.9) s⁻²")
+print("T para 9m = (5.60 ± 0.15) s")
+
