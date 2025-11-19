@@ -1,0 +1,33 @@
+name: Ejecutar acciones automáticas
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest - pull request
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Instalar Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python -
+
+      - name: Agregar Poetry al PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Instalar dependencias
+        run: poetry install
+
+      - name: Ejecutar el programa
+        run: poetry run python main.py
