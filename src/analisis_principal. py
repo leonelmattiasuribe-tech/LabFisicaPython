@@ -28,3 +28,35 @@ print("\n--- Resultados del Ajuste MMC (A y B) ---")
 print(f"Ecuación del ajuste lineal: T^2 = A*m + B")
 print(f"Coeficiente A (Pendiente) = {A:.4f}")
 print(f"Coeficiente B (Intercepto) = {B:.4f}")
+
+# 3.GRAFICA DE DATOS LINEALIZAOS Y AJUSTE 
+
+# Generar los puntos de la línea de ajuste (Recta: Y = A + B * X)
+# X_masa y Y_T2 ya fueron definidos arriba. A y B ya fueron calculados.
+X_fit = np.linspace(X_masa.min(), X_masa.max(), 100) 
+Y_fit = A + B * X_fit
+
+# Crear el gráfico
+plt.figure(figsize=(10, 6)) 
+
+# 1 Puntos Experimentales (Linealizados)
+plt.plot(X_masa, Y_T2, 
+         'bo', # Estilo: azul, circulos
+         label='Datos Experimentales Linealizados ($T^2$ vs Masa)') 
+
+# 2 Línea de Ajuste de Mínimos Cuadrados
+plt.plot(X_fit, Y_fit, 
+         'r-', # Estilo: rojo, línea sólida
+         label=f'Ajuste Lineal: $T^2 = ({A:.4f}) + ({B:.4f})m$') # Mostrar la ecuación en la leyenda
+ 
+plt.title('Linealización de Periodo al Cuadrado ($T^2$) vs Masa ($m$)')
+plt.xlabel('Masa (unidades relativas)')
+plt.ylabel('Periodo al Cuadrado $T^2$ ($s^2$)')
+plt.legend()
+plt.grid(True) 
+
+
+plt.savefig('grafico_analisis_principal.png')
+# plt.show() # Descomenta si quieres que la gráfica aparezca en una ventana
+
+print("\nAnálisis Principal: Gráfico generado y guardado como 'grafico_analisis_principal.png'.")
