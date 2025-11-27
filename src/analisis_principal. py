@@ -1,0 +1,30 @@
+import numpy as np
+from ajuste_mmc import calcular_coeficientes_mmc
+
+# 1. DATOS Y LINEALIZACIÓN (Y = T^2 vs X = m)
+
+# X = Masa m (Usamos las unidades relativas: 1m, 2m, 3m, 4m, 5m)
+X_masa = np.array([1.0, 2.0, 3.0, 4.0, 5.0]) 
+
+periodos = np.array([
+    1.000,   # T para 1m (Asunción: T=1.000s)
+    1.414,   # T para 2m (T^2 = 2.00)
+    1.732,   # T para 3m (T^2 = 3.00)
+    2.000,   # T para 4m (T^2 = 4.00)
+    2.236    # T para 5m (T^2 = 5.00)
+]) 
+
+# Y = Periodo al cuadrado T^2 [s^2] (Variable linealizada)
+Y_T2 = periodos**2
+
+print("--- Persona 2: Proceso de Linealización ---")
+print("Datos X (masa):", X_masa)
+print("Datos Y (T^2):", Y_T2)
+
+# 2. AJUSTE DE MMC (Cálculo de A y B)
+A, B = calcular_coeficientes_mmc(X_masa, Y_T2)
+
+print("\n--- Resultados del Ajuste MMC (A y B) ---")
+print(f"Ecuación del ajuste lineal: T^2 = A*m + B")
+print(f"Coeficiente A (Pendiente) = {A:.4f}")
+print(f"Coeficiente B (Intercepto) = {B:.4f}")
