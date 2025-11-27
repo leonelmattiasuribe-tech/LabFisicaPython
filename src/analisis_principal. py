@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt 
+# Importa la función de cálculo de tu archivo ajuste_mmc.py
 from ajuste_mmc import calcular_coeficientes_mmc
 
 ## 1. DATOS y LINEALIZACIÓN
 
-# X (Masa relativa) - Datos para el eje horizontal
+# X (Masa relativa) - Datos para el eje horizontal (Masa en unidades relativas)
 X_masa = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
 
 # Periodos T (s) - Datos de periodo extraídos para cada masa
@@ -13,9 +14,9 @@ periods = np.array([1.000, 1.414, 1.732, 2.000, 2.236])
 # Y (T^2) - Proceso de Linealización (Y = T^2), datos para el eje vertical
 Y_T2 = periods**2 
 
-print("--- Persona 2: Proceso de Linealización ---")
-print(f"Datos 'X (masa)': {X_masa}")
-print(f"Datos Linealizados 'Y ($T^2$)': {Y_T2}")
+print("--- Proceso de Linealización ---")
+print(f"Datos X (masa): {X_masa}")
+print(f"Datos Linealizados Y (T^2): {Y_T2}")
 
 
 ## 2. AJUSTE DE MMC (Cálculo de A, B y Errores)
@@ -23,41 +24,39 @@ print(f"Datos Linealizados 'Y ($T^2$)': {Y_T2}")
 # La función devuelve los 4 valores: A, B, sigma_A, sigma_B
 A, B, sigma_A, sigma_B = calcular_coeficientes_mmc(X_masa, Y_T2) 
 
-print("\n--- Resultados del Ajuste MMC (Finales) ---")
+print("\n--- Resultados del Ajuste MMC ---")
 print(f"Coeficiente A (Corte): {A:.4f} +- {sigma_A:.4f}")
 print(f"Coeficiente B (Pendiente): {B:.4f} +- {sigma_B:.4f}")
-print("------------------------------------------")
+print("----------------------------------")
 
 
-## 3 GRÁFICA DE DATOS LINEALIZADOS Y AJUSTE (Para adjuntar al informe)
+## 3. GRÁFICA DE DATOS LINEALIZADOS Y AJUSTE (Requerido para el informe)
 
-# Generar puntos para la línea de ajuste (Recta: Y = A + B * X)
+# Generar puntos para la línea de ajuste (Y = A + B * X)
 X_fit = np.linspace(X_masa.min(), X_masa.max(), 100) 
 Y_fit = A + B * X_fit
 
 # Crear el gráfico
 plt.figure(figsize=(10, 6)) 
 
-# Puntos Experimentales (Linealizados)
+# Puntos Experimentales
 plt.plot(X_masa, Y_T2, 
          'bo', 
-         label='Datos Experimentales Linealizados ($T^2$ vs Masa)') 
+         label='Datos Experimentales Linealizados') 
 
-# Línea de Ajuste de Mínimos Cuadrados
+# Línea de Ajuste (MMC)
 plt.plot(X_fit, Y_fit, 
          'r-', 
          label=f'Ajuste Lineal: $T^2 = ({A:.4f}) + ({B:.4f})m$') 
 
-# Etiquetas y Título 
+# Etiquetas y Título
 plt.title('Linealización de Periodo al Cuadrado ($T^2$) vs Masa ($m$)')
 plt.xlabel('Masa (unidades relativas)')
 plt.ylabel('Periodo al Cuadrado $T^2$ ($s^2$)')
 plt.legend()
 plt.grid(True) 
 
-# Guarda la imagen y muestra
+# Guarda la imagen (para el informe)
 plt.savefig('grafico_analisis_principal.png')
-# plt.show() 
 
-print("\n¡Análisis Principal COMPLETO!")
-print("Gráfico generado y guardado como 'grafico_analisis_principal.png'.")
+print("\nAnálisis Principal COMPLETO. Gráfico generado y guardado.")
