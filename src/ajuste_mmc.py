@@ -1,10 +1,10 @@
 import numpy as np
 
 def calcular_coeficientes_mmc(X, Y):
-    
+    '''
     Calcula los coeficientes A (intercepto) y B (pendiente)
     y sus respectivos errores sigma_A y sigma_B usando Mínimos Cuadrados.
-    
+    '''
     N = len(X)
     
     # 1 CÁLCULO DE SUMATORIAS
