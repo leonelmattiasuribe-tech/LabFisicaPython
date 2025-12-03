@@ -1,14 +1,21 @@
-from suma import suma
+import suma
 
-print("Probando suma A+B...")
+# Test 1
+if suma.suma(1, 2) == 3:
+    print("Test 1: ✓ 1 + 2 = 3")
+else:
+    print("Test 1: ✗ Falló")
 
-resultado1 = suma(3, 5)
-print(f"3 + 5 = {resultado1}")
+# Test 2  
+if suma.suma(-1, -1) == -2:
+    print("Test 2: ✓ -1 + (-1) = -2")
+else:
+    print("Test 2: ✗ Falló")
 
-resultado2 = suma(-2, 7)
-print(f"-2 + 7 = {resultado2}")
+# Test 3
+if suma.suma(0, 0) == 0:
+    print("Test 3: ✓ 0 + 0 = 0")
+else:
+    print("Test 3: ✗ Falló")
 
-resultado3 = suma(0, 0)
-print(f"0 + 0 = {resultado3}")
-
-print("Tests completados!")
+print("Fin de pruebas")
