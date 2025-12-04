@@ -6,9 +6,6 @@
 - Tiempo limitado para desarrollar más funciones
 
 #RESULTADOS Y CONCLUSIONES
-###discucion de Resultados:
-El código funciona bien en casos simples. 
-Suma A+B correctamente y los tests pasan.
 
 ### Conclusiones:
 - Aprendí a hacer funciones y tests en Python
